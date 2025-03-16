@@ -27,14 +27,18 @@ public class BuyerService {
         return useBuyerRepository.findById(id);
     }
 
-    public Buyer updateBuyer(Long id, Buyer buyerUpdated){
-        if (useBuyerRepository.existsById(id)) {
-            buyerUpdated.setId(id);
-            return useBuyerRepository.save(buyerUpdated);
-        }
+    public Buyer updateBuyer(Long id, Buyer buyerUpdated) {
+        Buyer existingBuyer = useBuyerRepository.findById(id).orElse(null);
+        if (existingBuyer != null) {
+            existingBuyer.setName(buyerUpdated.getName());
+            existingBuyer.setEmail(buyerUpdated.getEmail());
 
+            return useBuyerRepository.save(existingBuyer);
+        }
         return null;
     }
+
+
 
     public void deleteBuyer(Long id) {
         useBuyerRepository.deleteById(id);

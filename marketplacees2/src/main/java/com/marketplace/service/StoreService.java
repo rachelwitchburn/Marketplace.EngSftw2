@@ -28,11 +28,12 @@ public class StoreService {
     }
 
     public Store updateStore(Long id, Store storeUpdated){
-        if (useStoreRepository.existsById(id)) {
-            storeUpdated.setId(id);
-            return useStoreRepository.save(storeUpdated);
+        Store existingStore = useStoreRepository.findById(id).orElse(null);
+        if (existingStore != null) {
+            existingStore.setName(storeUpdated.getName());
+            existingStore.setEmail(storeUpdated.getAddress());
+            return useStoreRepository.save(existingStore);
         }
-
         return null;
     }
 
