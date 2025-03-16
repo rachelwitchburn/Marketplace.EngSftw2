@@ -1,6 +1,5 @@
-package com.marketplace.service;
-
 import com.marketplace.model.Buyer;
+import com.marketplace.service.BuyerService;
 import com.marketplace.repository.BuyerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,14 +33,14 @@ public class BuyerServiceTest {
     @Test
     void testSaveBuyer() {
         Buyer buyer = new Buyer();
-        buyer.setNome("João");
+        buyer.setName("João");
         buyer.setEmail("joao@email.com");
 
         when(buyerRepository.save(any(Buyer.class))).thenReturn(buyer);
 
         Buyer savedBuyer = buyerService.saveBuyer(buyer);
 
-        assertEquals("João", savedBuyer.getNome());
+        assertEquals("João", savedBuyer.getName());
         assertEquals("joao@email.com", savedBuyer.getEmail());
     }
 
@@ -49,11 +48,11 @@ public class BuyerServiceTest {
     @Test
     void testListBuyers() {
         Buyer buyer1 = new Buyer();
-        buyer1.setNome("Ana");
+        buyer1.setName("Ana");
         buyer1.setEmail("ana@email.com");
 
         Buyer buyer2 = new Buyer();
-        buyer2.setNome("Carlos");
+        buyer2.setName("Carlos");
         buyer2.setEmail("carlos@email.com");
 
         when(buyerRepository.findAll()).thenReturn(Arrays.asList(buyer1, buyer2));
@@ -61,7 +60,7 @@ public class BuyerServiceTest {
         List<Buyer> buyers = buyerService.listBuyers();
 
         assertEquals(2, buyers.size());
-        assertEquals("Ana", buyers.get(0).getNome());
+        assertEquals("Ana", buyers.get(0).getName());
     }
 
     // Teste de buscar Buyer por ID
@@ -69,14 +68,14 @@ public class BuyerServiceTest {
     void testGetBuyerById() {
         Buyer buyer = new Buyer();
         buyer.setId(1L);
-        buyer.setNome("Lucas");
+        buyer.setName("Lucas");
 
         when(buyerRepository.findById(1L)).thenReturn(Optional.of(buyer));
 
         Optional<Buyer> foundBuyer = buyerService.getBuyerById(1L);
 
         assertTrue(foundBuyer.isPresent());
-        assertEquals("Lucas", foundBuyer.get().getNome());
+        assertEquals("Lucas", foundBuyer.get().getName());
     }
 
     // Teste de atualização de Buyer
@@ -84,20 +83,27 @@ public class BuyerServiceTest {
     void testUpdateBuyer() {
         Buyer existingBuyer = new Buyer();
         existingBuyer.setId(1L);
-        existingBuyer.setNome("Joana");
+        existingBuyer.setName("Joana");
         existingBuyer.setEmail("joana@email.com");
 
         Buyer updatedBuyerData = new Buyer();
-        updatedBuyerData.setNome("Joana Silva");
+        updatedBuyerData.setName("Joana Silva");
         updatedBuyerData.setEmail("joana.silva@email.com");
 
         when(buyerRepository.findById(1L)).thenReturn(Optional.of(existingBuyer));
-        when(buyerRepository.save(any(Buyer.class))).thenReturn(updatedBuyerData);
+
+        when(buyerRepository.existsById(1L)).thenReturn(true);
+
+        when(buyerRepository.save(any(Buyer.class))).thenAnswer(invocation -> {
+            Buyer updatedBuyer = invocation.getArgument(0);
+            updatedBuyer.setId(existingBuyer.getId());  // Mantém o ID do comprador original
+            return updatedBuyer;
+        });
 
         Buyer updatedBuyer = buyerService.updateBuyer(1L, updatedBuyerData);
 
         assertNotNull(updatedBuyer);
-        assertEquals("Joana Silva", updatedBuyer.getNome());
+        assertEquals("Joana Silva", updatedBuyer.getName());
         assertEquals("joana.silva@email.com", updatedBuyer.getEmail());
     }
 
@@ -105,7 +111,7 @@ public class BuyerServiceTest {
     @Test
     void testUpdateBuyer_NotFound() {
         Buyer updatedBuyerData = new Buyer();
-        updatedBuyerData.setNome("Maria");
+        updatedBuyerData.setName("Maria");
 
         when(buyerRepository.findById(99L)).thenReturn(Optional.empty());
 

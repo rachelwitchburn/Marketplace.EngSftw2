@@ -1,6 +1,5 @@
-package com.marketplace.service;
-
 import com.marketplace.model.Store;
+import com.marketplace.service.StoreService;
 import com.marketplace.repository.StoreRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -85,13 +84,19 @@ public class StoreServiceTest {
         Store updatedStoreData = new Store();
         updatedStoreData.setName("Loja de Moda");
 
+
         when(storeRepository.findById(1L)).thenReturn(Optional.of(existingStore));
-        when(storeRepository.save(any(Store.class))).thenReturn(updatedStoreData);
+        when(storeRepository.save(any(Store.class))).thenAnswer(invocation -> {
+            Store storeToSave = invocation.getArgument(0);
+            storeToSave.setId(existingStore.getId()); // Garantir que o ID seja mantido
+            return storeToSave;
+        });
 
         Store updatedStore = storeService.updateStore(1L, updatedStoreData);
 
         assertNotNull(updatedStore);
         assertEquals("Loja de Moda", updatedStore.getName());
+        assertEquals(1L, updatedStore.getId());
     }
 
     // Teste de atualização com ID inexistente

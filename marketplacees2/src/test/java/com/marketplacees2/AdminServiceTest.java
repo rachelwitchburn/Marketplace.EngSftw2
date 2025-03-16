@@ -1,6 +1,5 @@
-package com.marketplace.service;
-
 import com.marketplace.model.Admin;
+import com.marketplace.service.AdminService;
 import com.marketplace.repository.AdminRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,5 @@
-package com.marketplace.service;
-
 import com.marketplace.model.Product;
+import com.marketplace.service.ProductService;
 import com.marketplace.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
