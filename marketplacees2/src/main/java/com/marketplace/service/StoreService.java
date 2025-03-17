@@ -6,6 +6,10 @@ import java.util.List;
 
 public class StoreService {
     private StoreRepository repository = new StoreRepository();
+
+    public StoreService(){
+        this.repository = repository;
+    }
     
     public void addStore(Store store) {
         repository.addStore(store);

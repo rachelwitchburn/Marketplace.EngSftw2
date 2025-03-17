@@ -6,6 +6,10 @@ import java.util.List;
 
 public class BuyerService {
     private BuyerRepository repository = new BuyerRepository();
+
+    public BuyerService(BuyerRepository repository) {
+        this.repository = repository;
+    }
     
     public void addBuyer(Buyer buyer) {
         repository.addBuyer(buyer);

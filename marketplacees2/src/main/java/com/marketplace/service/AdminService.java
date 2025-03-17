@@ -6,6 +6,10 @@ import java.util.List;
 
 public class AdminService {
     private AdminRepository repository = new AdminRepository();
+
+    public AdminService(AdminRepository repository) {
+        this.repository = repository;
+    }
     
     public void addAdmin(Admin admin) {
         repository.addAdmin(admin);
