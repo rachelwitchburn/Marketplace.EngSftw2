@@ -1,4 +1,4 @@
-package service;
+package com.marketplacees2.service;
 
 import com.marketplace.Enum.ProductType;
 import com.marketplace.model.Product;
@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Arrays;
@@ -29,23 +30,28 @@ public class ProductServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    private Product createProduct(String name, String price, ProductType productType, String brand, String description) {
+        return new Product(name, price, productType, brand, description);
+    }
+
     @Test
     void testAddProduct() {
-        Product product = new Product("Notebook Acer","2500,00", ProductType.ELETRÔNICO,"Acer","Descrição");
+        Product product = createProduct("Notebook Acer", "2500,00", ProductType.ELETRÔNICO, "Acer", "Descrição");
 
-        // Simula o comportamento de método void
-        doNothing().when(productRepository).addProduct(product);
+        ArgumentCaptor<Product> productCaptor = ArgumentCaptor.forClass(Product.class);
+        doNothing().when(productRepository).addProduct(productCaptor.capture());
 
         productService.addProduct(product);
 
-        // Verifica se o método foi chamado uma vez
-        verify(productRepository, times(1)).addProduct(product);
+        verify(productRepository, times(1)).addProduct(productCaptor.capture());
+        assertEquals(product.getName(), productCaptor.getValue().getName());
+        assertEquals(product.getValue(), productCaptor.getValue().getValue());
     }
 
     @Test
     void testListProducts() {
-        Product product1 = new Product("Notebook Acer","2500,00", ProductType.ELETRÔNICO,"Acer","Descrição");
-        Product product2 = new Product("Notebook Multilaser","2000,00", ProductType.ELETRÔNICO,"Multilaser","Descrição");
+        Product product1 = createProduct("Notebook Acer", "2500,00", ProductType.ELETRÔNICO, "Acer", "Descrição");
+        Product product2 = createProduct("Notebook Multilaser", "2000,00", ProductType.ELETRÔNICO, "Multilaser", "Descrição");
 
         when(productRepository.getAllProducts()).thenReturn(Arrays.asList(product1, product2));
 
@@ -57,8 +63,17 @@ public class ProductServiceTest {
     }
 
     @Test
+    void testListProductsEmpty() {
+        when(productRepository.getAllProducts()).thenReturn(Arrays.asList());
+
+        List<Product> products = productService.listProducts();
+
+        assertTrue(products.isEmpty(), "A lista de produtos deve estar vazia.");
+    }
+
+    @Test
     void testUpdateProduct_Success() {
-        Product productToUpdate = new Product("Monitor","3000,00", ProductType.ELETRÔNICO,"Acer","Descrição");
+        Product productToUpdate = createProduct("Monitor", "3000,00", ProductType.ELETRÔNICO, "Acer", "Descrição");
 
         when(productRepository.updateProduct(productToUpdate)).thenReturn(true);
 
@@ -70,33 +85,61 @@ public class ProductServiceTest {
 
     @Test
     void testUpdateProduct_NotFound() {
-        Product productToUpdate = new Product("Mouse","300,00", ProductType.ELETRÔNICO,"Logitech","Descrição");
+        Product productToUpdate = createProduct("Mouse", "300,00", ProductType.ELETRÔNICO, "Logitech", "Descrição");
 
         when(productRepository.updateProduct(productToUpdate)).thenReturn(false);
 
         boolean result = productService.updateProduct(productToUpdate);
 
-        assertFalse(result);
+        assertFalse(result, "O produto não deveria ter sido atualizado, pois não foi encontrado.");
         verify(productRepository, times(1)).updateProduct(productToUpdate);
     }
 
     @Test
     void testRemoveProduct_Success() {
-        when(productRepository.removeProduct(1)).thenReturn(true);
+        int productId = 1;
 
-        boolean result = productService.removeProduto(1);
+        when(productRepository.removeProduct(productId)).thenReturn(true);
+
+        boolean result = productService.removeProduto(productId);
 
         assertTrue(result);
-        verify(productRepository, times(1)).removeProduct(1);
+        verify(productRepository, times(1)).removeProduct(productId);
     }
 
     @Test
     void testRemoveProduct_NotFound() {
-        when(productRepository.removeProduct(99)).thenReturn(false);
+        int productId = 99;
 
-        boolean result = productService.removeProduto(99);
+        when(productRepository.removeProduct(productId)).thenReturn(false);
 
-        assertFalse(result);
-        verify(productRepository, times(1)).removeProduct(99);
+        boolean result = productService.removeProduto(productId);
+
+        assertFalse(result, "O produto não deveria ter sido removido, pois não foi encontrado.");
+        verify(productRepository, times(1)).removeProduct(productId);
+    }
+
+    @Test
+    void testAddProductThrowsException() {
+        Product product = createProduct("Notebook Acer", "2500,00", ProductType.ELETRÔNICO, "Acer", "Descrição");
+
+        // Simula exceção no repositório
+        doThrow(new RuntimeException("Erro ao adicionar produto")).when(productRepository).addProduct(product);
+
+        assertThrows(RuntimeException.class, () -> {
+            productService.addProduct(product);
+        }, "Esperado que uma exceção seja lançada ao adicionar produto.");
+    }
+
+    @Test
+    void testUpdateProductThrowsException() {
+        Product productToUpdate = createProduct("Mouse", "300,00", ProductType.ELETRÔNICO, "Logitech", "Descrição");
+
+        // Simula exceção no repositório
+        when(productRepository.updateProduct(productToUpdate)).thenThrow(new RuntimeException("Erro ao atualizar produto"));
+
+        assertThrows(RuntimeException.class, () -> {
+            productService.updateProduct(productToUpdate);
+        }, "Esperado que uma exceção seja lançada ao atualizar produto.");
     }
 }
