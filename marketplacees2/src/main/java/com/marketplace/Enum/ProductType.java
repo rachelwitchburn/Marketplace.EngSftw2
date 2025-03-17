@@ -1,6 +1,6 @@
 package com.marketplace.Enum;
 
-public enum ProductEnum {
+public enum ProductType {
     LIVRO,
     ELETRÔNICO,
     ROUPA,

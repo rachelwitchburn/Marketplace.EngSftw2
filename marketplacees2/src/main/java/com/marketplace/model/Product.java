@@ -1,32 +1,88 @@
 package com.marketplace.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-import com.marketplace.Enum.ProductEnum;
+import java.io.Serializable;
 
-@Entity
-@Table(name="products")
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-	
-    @Column(nullable = false, unique = true)
+import com.marketplace.Enum.ProductType;
+
+public class Product implements Serializable{
+    private static final long serialVersionUID = 1L;
+
+    private int id;
     private String name;
-
-    @Column(nullable = false)
     private String value;
-
-    @Column(nullable = false, unique = true)
-    private ProductEnum type;
-
-    @Column(nullable = false, unique = true)
+    private ProductType type;
     private String brand;
-
-    @Column(nullable = false)
     private String description;
+
+    public Product() {
+
+    }
+
+    public Product(String name, String value, ProductType type, String brand, String description) {
+        this.name = name;
+        this.value = value;
+        this.type = type;
+        this.brand = brand;
+        this.description = description;
+    }
+
+    public int getId() { 
+        return id; 
+    }
+    
+    public void setId(int id) { 
+        this.id = id; 
+    }
+
+    public String getName() { 
+        return name; 
+    }
+
+    public void setName(String name) { 
+        this.name = name; 
+    }
+
+    public String getValue() { 
+        return value; 
+    }
+
+    public void setValue(String value) { 
+        this.value = value; 
+    }
+
+    public ProductType getType() { 
+        return type; 
+    }
+
+    public void setType(ProductType type) { 
+        this.type = type; 
+    }
+
+    public String getBrand() { 
+        return brand; 
+    }
+
+    public void setBrand(String brand) { 
+        this.brand = brand; 
+    }
+
+    public String getDescription() { 
+        return description; 
+    }
+
+    public void setDescriptipn(String description) { 
+        this.description = description; 
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+               "nome='" + name + '\'' +
+               ", valor='" + value + '\'' +
+               ", categoria='" + type + '\'' +
+               ", marca='" + brand + '\'' +
+               ", descrição='" + description + '\'' +
+               '}';
+    }
 }
+

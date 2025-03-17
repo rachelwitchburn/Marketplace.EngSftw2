@@ -2,45 +2,24 @@ package com.marketplace.service;
 
 import com.marketplace.model.Buyer;
 import com.marketplace.repository.BuyerRepository;
-
 import java.util.List;
-import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-@Service
 public class BuyerService {
-
-    @Autowired
-    private BuyerRepository useBuyerRepository;
-
-    public Buyer saveBuyer(Buyer buyer) {
-        return useBuyerRepository.save(buyer);
+    private BuyerRepository repository = new BuyerRepository();
+    
+    public void addBuyer(Buyer buyer) {
+        repository.addBuyer(buyer);
     }
     
     public List<Buyer> listBuyers() {
-        return useBuyerRepository.findAll();
+        return repository.getAllBuyers();
     }
-
-    public Optional<Buyer> getBuyerById(Long id){
-        return useBuyerRepository.findById(id);
+    
+    public boolean updateBuyer(Buyer buyer) {
+        return repository.updateBuyer(buyer);
     }
-
-    public Buyer updateBuyer(Long id, Buyer buyerUpdated) {
-        Buyer existingBuyer = useBuyerRepository.findById(id).orElse(null);
-        if (existingBuyer != null) {
-            existingBuyer.setName(buyerUpdated.getName());
-            existingBuyer.setEmail(buyerUpdated.getEmail());
-
-            return useBuyerRepository.save(existingBuyer);
-        }
-        return null;
-    }
-
-
-
-    public void deleteBuyer(Long id) {
-        useBuyerRepository.deleteById(id);
+    
+    public boolean removeBuyer(int id) {
+        return repository.removeBuyer(id);
     }
 }
